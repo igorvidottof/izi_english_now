@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:izi_english_now/screens/lesson_categories_screen.dart';
+import 'package:izi_english_now/models/decks_mobx.dart';
+import 'package:izi_english_now/screens/decks_screen.dart';
 
 void main() {
   GetIt getIt = GetIt.I;
+  getIt.registerSingleton<DecksMobx>(DecksMobx());
   runApp(MyApp());
 }
 
@@ -19,9 +21,9 @@ class MyApp extends StatelessWidget {
         chipTheme:
             ChipTheme.of(context).copyWith(backgroundColor: Colors.white),
       ),
-      home: LessonCategoriesScreen(),
+      home: DecksScreen(),
       routes: {
-        LessonCategoriesScreen.routeName: (ctx) => LessonCategoriesScreen(),
+        DecksScreen.routeName: (ctx) => DecksScreen(),
       },
     );
   }

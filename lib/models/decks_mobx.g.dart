@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'lesson_category_mobx.dart';
+part of 'decks_mobx.dart';
 
 // **************************************************************************
 // StoreGenerator
@@ -8,27 +8,25 @@ part of 'lesson_category_mobx.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
-mixin _$LessonCategoryMobx on _LessonCategoryMobxBase, Store {
-  final _$lessonsCompletedAtom =
-      Atom(name: '_LessonCategoryMobxBase.lessonsCompleted');
+mixin _$DecksMobx on _DecksMobxBase, Store {
+  final _$_DecksMobxBaseActionController =
+      ActionController(name: '_DecksMobxBase');
 
   @override
-  int get lessonsCompleted {
-    _$lessonsCompletedAtom.reportRead();
-    return super.lessonsCompleted;
-  }
-
-  @override
-  set lessonsCompleted(int value) {
-    _$lessonsCompletedAtom.reportWrite(value, super.lessonsCompleted, () {
-      super.lessonsCompleted = value;
-    });
+  void completeLesson(int deckId) {
+    final _$actionInfo = _$_DecksMobxBaseActionController.startAction(
+        name: '_DecksMobxBase.completeLesson');
+    try {
+      return super.completeLesson(deckId);
+    } finally {
+      _$_DecksMobxBaseActionController.endAction(_$actionInfo);
+    }
   }
 
   @override
   String toString() {
     return '''
-lessonsCompleted: ${lessonsCompleted}
+
     ''';
   }
 }

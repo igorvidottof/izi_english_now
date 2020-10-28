@@ -2,11 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:izi_english_now/models/question.dart';
 
 import 'package:mobx/mobx.dart';
-part 'lesson_category_mobx.g.dart';
+part 'deck.g.dart';
 
-class LessonCategoryMobx = _LessonCategoryMobxBase with _$LessonCategoryMobx;
+class Deck = _DeckBase with _$Deck;
 
-abstract class _LessonCategoryMobxBase with Store {
+abstract class _DeckBase with Store {
+  final int id;
   final String title;
   final String description;
   final int totalLessons;
@@ -14,7 +15,8 @@ abstract class _LessonCategoryMobxBase with Store {
   int lessonsCompleted;
   final List<Question> questions;
 
-  _LessonCategoryMobxBase({
+  _DeckBase({
+    @required this.id,
     @required this.title,
     @required this.description,
     @required this.totalLessons,

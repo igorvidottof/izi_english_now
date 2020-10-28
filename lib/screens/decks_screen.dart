@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
+import 'package:izi_english_now/models/deck.dart';
+import 'package:izi_english_now/models/decks_mobx.dart';
 import 'package:izi_english_now/widgets/app_drawer.dart';
 
-class LessonCategoriesScreen extends StatelessWidget {
-  static const routeName = '/lesson-categories';
+class DecksScreen extends StatelessWidget {
+  static const routeName = '/decks';
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).primaryColor;
+    final decksMobx = GetIt.I.get<DecksMobx>();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Curso'),
@@ -20,7 +27,7 @@ class LessonCategoriesScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.only(bottom: 10),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
+                  color: primaryColor,
                   borderRadius: BorderRadius.only(
                     bottomRight: Radius.circular(70),
                   ),
@@ -43,12 +50,12 @@ class LessonCategoriesScreen extends StatelessWidget {
                         Chip(
                           avatar: Icon(
                             Icons.face,
-                            color: Theme.of(context).primaryColor,
+                            color: primaryColor,
                           ),
                           label: Text(
                             'Você está no nível 6',
                             style: TextStyle(
-                              color: Theme.of(context).primaryColor,
+                              color: primaryColor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -60,12 +67,16 @@ class LessonCategoriesScreen extends StatelessWidget {
                         SizedBox(
                           height: 100,
                           width: 100,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 8,
-                            value: 0.48,
-                            backgroundColor: Colors.white12,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          child: Observer(
+                            builder: (_) {
+                              return CircularProgressIndicator(
+                                strokeWidth: 8,
+                                value: decksMobx.getCourseCompletion(),
+                                backgroundColor: Colors.white12,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              );
+                            },
                           ),
                         ),
                         Container(
@@ -77,14 +88,18 @@ class LessonCategoriesScreen extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                '48%',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  color: Colors.white,
-                                ),
+                              Observer(
+                                builder: (_) {
+                                  return Text(
+                                    '${(decksMobx.getCourseCompletion() * 100).toStringAsFixed(0)}%',
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      color: Colors.white,
+                                    ),
+                                  );
+                                },
                               ),
-                              Text(
+                              const Text(
                                 'completo',
                                 style: TextStyle(
                                   color: Colors.white,
@@ -104,9 +119,11 @@ class LessonCategoriesScreen extends StatelessWidget {
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: 10,
+                itemCount: decksMobx.items.length,
                 itemBuilder: (ctx, i) {
-                  return LessonCategoryItem();
+                  return LessonCategoryItem(
+                    deck: decksMobx.items[i],
+                  );
                 },
               ),
             ],
@@ -119,13 +136,19 @@ class LessonCategoriesScreen extends StatelessWidget {
 
 // LessonCategoriesScreen Widgets
 class LessonCategoryItem extends StatelessWidget {
+  final Deck deck;
+
+  const LessonCategoryItem({Key key, this.deck}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    final deckMobx = GetIt.I.get<DecksMobx>();
+
     return Card(
       child: ListTile(
-        onTap: () => print('Lesson Category Item'),
+        onTap: () => print(deck.title),
         leading: Icon(Icons.book),
-        title: Text('Introdução'),
+        title: Text(deck.title),
         trailing: Icon(Icons.expand_more),
         isThreeLine: true,
         subtitle: Column(
@@ -133,7 +156,7 @@ class LessonCategoryItem extends StatelessWidget {
           children: [
             SizedBox(height: 2),
             Text(
-              'A descrição do módulo vem aqui',
+              deck.description,
               textAlign: TextAlign.start,
             ),
             SizedBox(height: 5),
@@ -146,23 +169,39 @@ class LessonCategoryItem extends StatelessWidget {
                       color: Colors.grey.shade400,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: FractionallySizedBox(
-                      widthFactor: 0.5,
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.purple,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                    // LESSON CATEGORY PROGRESS
+                    child: Observer(
+                      builder: (_) {
+                        return FractionallySizedBox(
+                          widthFactor:
+                              deck.lessonsCompleted / deck.totalLessons,
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.purple,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
                 SizedBox(width: 5),
-                Text('5/10'),
+                Observer(
+                  builder: (_) {
+                    return Text(
+                      '${deck.lessonsCompleted}/${deck.totalLessons}',
+                    );
+                  },
+                ),
               ],
             ),
             SizedBox(height: 8),
+            FlatButton(
+              onPressed: () => deckMobx.completeLesson(deck.id),
+              child: Text('test'),
+            ),
           ],
         ),
       ),

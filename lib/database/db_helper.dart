@@ -3,11 +3,11 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
 
 // LESSON CATEGORY TABLE COLUMNS
-const LC_TABLE = 'lesson_category';
-const LC_ID = 'id';
-const LC_TITLE = 'title';
-const LC_TOTAL_LESSONS = 'total_lessons';
-const LC_LESSONS_COMPLETED = 'lessons_completed';
+const DECK_TABLE = 'deck';
+const DECK_ID = 'id';
+const DECK_TITLE = 'title';
+const DECK_TOTAL_LESSONS = 'total_lessons';
+const DECK_LESSONS_COMPLETED = 'lessons_completed';
 
 class DbHelper {
   static Future<Database> getDatabase() async {
@@ -19,37 +19,37 @@ class DbHelper {
       path.join(dbPath, 'izi_english_now.db'),
       onCreate: (db, version) {
         return db.execute(
-          'CREATE TABLE $LC_TABLE($LC_ID INTEGER AUTO_INCREMENT PRIMARY KEY, $LC_TITLE TEXT, $LC_TOTAL_LESSONS INTEGER, $LC_LESSONS_COMPLETED INTEGER)',
+          'CREATE TABLE $DECK_TABLE($DECK_ID INTEGER AUTO_INCREMENT PRIMARY KEY, $DECK_TITLE TEXT, $DECK_TOTAL_LESSONS INTEGER, $DECK_LESSONS_COMPLETED INTEGER)',
         );
       },
       version: 1,
     );
   }
 
-  static Future<void> insertLessonCategory(
-    Map<String, dynamic> lessonCategory,
+  static Future<void> insertDeck(
+    Map<String, dynamic> deck,
   ) async {
     final db = await DbHelper.getDatabase();
-    final result = await db.insert(LC_TABLE, lessonCategory);
+    final result = await db.insert(DECK_TABLE, deck);
     print(result);
   }
 
-  static Future<void> completeLesson(String lessonCategory) async {
+  static Future<void> completeLesson(String deck) async {
     final db = await DbHelper.getDatabase();
     final result = await db.query(
-      '$LC_TABLE',
-      columns: ['$LC_LESSONS_COMPLETED'],
-      where: '$LC_TITLE = $lessonCategory',
+      '$DECK_TABLE',
+      columns: ['$DECK_LESSONS_COMPLETED'],
+      where: '$DECK_TITLE = $deck',
     );
     print(result);
   }
 
-  static Future<void> getLessonCompletionInfo(String lessonCategory) async {
+  static Future<void> getLessonCompletionInfo(String deck) async {
     final db = await DbHelper.getDatabase();
     final result = await db.query(
-      '$LC_TABLE',
-      columns: ['$LC_TOTAL_LESSONS, $LC_LESSONS_COMPLETED'],
-      where: '$LC_TITLE = $lessonCategory',
+      '$DECK_TABLE',
+      columns: ['$DECK_TOTAL_LESSONS, $DECK_LESSONS_COMPLETED'],
+      where: '$DECK_TITLE = $deck',
     );
     print(result);
   }
