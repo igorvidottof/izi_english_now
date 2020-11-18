@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:izi_english_now/models/deck.dart';
+import 'package:izi_english_now/models/deck_category.dart';
 import 'package:izi_english_now/models/decks_mobx.dart';
+import 'package:izi_english_now/screens/deck_screen.dart';
 import 'package:izi_english_now/widgets/app_drawer.dart';
 
 class DecksScreen extends StatelessWidget {
@@ -114,15 +116,17 @@ class DecksScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: 5,
+                height: 10,
               ),
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: decksMobx.items.length,
+                itemCount: decksMobx.deckCategories.length,
                 itemBuilder: (ctx, i) {
-                  return LessonCategoryItem(
-                    deck: decksMobx.items[i],
+                  final deckCategory = decksMobx.deckCategories[i];
+                  return DeckCategoryItem(
+                    deckCategory: deckCategory,
+                    key: ValueKey(deckCategory.id),
                   );
                 },
               ),
@@ -134,22 +138,97 @@ class DecksScreen extends StatelessWidget {
   }
 }
 
-// LessonCategoriesScreen Widgets
-class LessonCategoryItem extends StatelessWidget {
-  final Deck deck;
+class DeckCategoryItem extends StatefulWidget {
+  final DeckCategory deckCategory;
 
-  const LessonCategoryItem({Key key, this.deck}) : super(key: key);
+  const DeckCategoryItem({
+    Key key,
+    @required this.deckCategory,
+  }) : super(key: key);
+
+  @override
+  _DeckCategoryItemState createState() => _DeckCategoryItemState();
+}
+
+class _DeckCategoryItemState extends State<DeckCategoryItem> {
+  var _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
-    final deckMobx = GetIt.I.get<DecksMobx>();
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            ListTile(
+              onTap: () {
+                setState(() {
+                  _isExpanded = !_isExpanded;
+                });
+              },
+              contentPadding: EdgeInsets.zero,
+              leading: CircleAvatar(
+                radius: 22,
+                child: Padding(
+                  padding: const EdgeInsets.all(3),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text('100%'),
+                  ),
+                ),
+              ),
+              title: Text(widget.deckCategory.title),
+              subtitle: Text('Descrição da categoria'),
+              trailing: IconButton(
+                icon: _isExpanded
+                    ? Icon(Icons.expand_less)
+                    : Icon(Icons.expand_more),
+                onPressed: () {
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                  });
+                },
+              ),
+            ),
+            if (_isExpanded)
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: widget.deckCategory.decks.length,
+                itemBuilder: (ctx, i) {
+                  return Column(
+                    children: [
+                      DeckItem(
+                        deck: widget.deckCategory.decks[i],
+                      ),
+                      SizedBox(height: 4),
+                    ],
+                  );
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
+class DeckItem extends StatelessWidget {
+  final Deck deck;
+
+  const DeckItem({Key key, this.deck}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        onTap: () => print(deck.title),
+        onTap: () => Navigator.of(context).pushNamed(
+          DeckScreen.routeName,
+          arguments: deck.id,
+        ),
         leading: Icon(Icons.book),
         title: Text(deck.title),
-        trailing: Icon(Icons.expand_more),
+        trailing: Icon(Icons.keyboard_arrow_right),
         isThreeLine: true,
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,7 +248,7 @@ class LessonCategoryItem extends StatelessWidget {
                       color: Colors.grey.shade400,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    // LESSON CATEGORY PROGRESS
+                    // DECK CATEGORY PROGRESS
                     child: Observer(
                       builder: (_) {
                         return FractionallySizedBox(
@@ -198,10 +277,6 @@ class LessonCategoryItem extends StatelessWidget {
               ],
             ),
             SizedBox(height: 8),
-            FlatButton(
-              onPressed: () => deckMobx.completeLesson(deck.id),
-              child: Text('test'),
-            ),
           ],
         ),
       ),

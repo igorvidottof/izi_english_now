@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:izi_english_now/models/decks_mobx.dart';
+import 'package:izi_english_now/screens/deck_screen.dart';
 import 'package:izi_english_now/screens/decks_screen.dart';
 
 void main() {
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
       home: DecksScreen(),
       routes: {
         DecksScreen.routeName: (ctx) => DecksScreen(),
+        DeckScreen.routeName: (ctx) => DeckScreen(),
       },
     );
   }
